@@ -1,29 +1,25 @@
 import streamlit as st
-from app.utils.file_handler import read_csv, get_metadata
+from app.data_handler import save_uploaded_file, read_csv, clean_csv
 
-st.set_page_config(page_title="CSV RAG Bot - Upload", layout="wide")
-
-st.title("📄 CSV Upload & Preview")
+st.title("CSV RAG Bot - Phase 3")
 
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
-if uploaded_file is not None:
-    try:
-        df = read_csv(uploaded_file)
-        st.subheader("🔍 Preview of Data")
+if uploaded_file:
+    st.success("✅ File uploaded successfully.")
+    
+    file_path = save_uploaded_file(uploaded_file)
+    df = read_csv(file_path)
+
+    if df is not None:
+        st.info("Showing top 5 rows of the raw data:")
         st.dataframe(df.head())
 
-        st.subheader("🧠 Metadata")
-        metadata = get_metadata(df)
+        df_clean = clean_csv(df)
+        st.success("✅ Data cleaned successfully.")
+        st.dataframe(df_clean.head())
 
-        st.markdown("**Columns & Data Types**")
-        st.json(metadata["dtypes"])
-
-        st.markdown("**Null Values Per Column**")
-        st.json(metadata["null_counts"])
-
-        st.markdown("**Summary Statistics**")
-        st.json(metadata["summary_stats"])
-
-    except ValueError as e:
-        st.error(str(e))
+        # (Optionally save cleaned dataframe to session)
+        st.session_state["clean_df"] = df_clean
+    else:
+        st.error("❌ Failed to read CSV. Please check file format.")
