@@ -12,12 +12,33 @@ if uploaded_file:
     df = read_csv(file_path)
 
     if df is not None:
-        st.info("Showing top 5 rows of the raw data:")
-        st.dataframe(df.head())
-
         df_clean = clean_csv(df)
-        st.success("✅ Data cleaned successfully.")
-        st.dataframe(df_clean.head())
+
+        with st.expander("📊 Raw File Metadata", expanded=False):
+            st.write(f"🔢 Shape: {df.shape[0]} rows × {df.shape[1]} columns")
+            st.write("🧠 Column Names:", list(df.columns))
+            st.write("🧮 Data Types:")
+            st.write(df.dtypes)
+            st.write("❓ Missing Values Count:")
+            st.write(df.isnull().sum())
+
+        with st.expander("🧼 Cleaned File Metadata", expanded=False):
+            st.write(f"🔢 Shape: {df_clean.shape[0]} rows × {df_clean.shape[1]} columns")
+            st.write("🧠 Column Names:", list(df_clean.columns))
+            st.write("🧮 Data Types:")
+            st.write(df_clean.dtypes)
+            st.write("❓ Missing Values Count:")
+            st.write(df_clean.isnull().sum())
+
+
+        with st.expander("🔍 Preview: Top 5 Rows of Raw Data", expanded=False):
+            st.dataframe(df.head())
+
+        with st.expander("🔍 Preview: Top 5 Rows of Cleaned Data", expanded=False):
+            st.dataframe(df_clean.head())
+
+        
+
 
         # (Optionally save cleaned dataframe to session)
         st.session_state["clean_df"] = df_clean
